@@ -2,9 +2,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Adversarial%20ML-BC8CFF?style=flat-square" />
-  <img src="https://img.shields.io/badge/OWASP%20LLM%20Top%2010-000000?style=flat-square&logo=owasp&logoColor=white" />
-  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
-  <img src="https://img.shields.io/badge/MITRE%20ATLAS-58A6FF?style=flat-square" />
+  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" />
+  <img src="https://img.shields.io/badge/XGBoost-006400?style=flat-square" />
+  <img src="https://img.shields.io/badge/ART%20(Adversarial%20Robustness%20Toolbox)-0B69A3?style=flat-square" />
 </p>
 
 ---
