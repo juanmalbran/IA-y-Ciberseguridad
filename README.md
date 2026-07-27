@@ -35,22 +35,24 @@ trainer = AdversarialTrainer(art_classifier, attacks=attack).fit(X_train, y_trai
 
 ## Detección de spam y churn (fundamentos + métricas)
 
+Elegir bien la **métrica** es el corazón del problema: la *accuracy* (porcentaje de aciertos) engaña cuando una clase es mucho más frecuente que otra. Por eso se usan métricas que sí penalizan los errores importantes: el **F1-score** (equilibra no dejar pasar positivos ni marcar falsos positivos) y **ROC-AUC** (mide qué tan bien el modelo separa las dos clases).
+
 | Caso | Problema | Métrica elegida | Por qué |
 |---|---|---|---|
 | Spam en emails | Clasificación binaria | **F1-score** | Un falso negativo (spam no detectado) llega al usuario; accuracy sola engaña si hay desbalanceo |
-| Churn de clientes (~85/15 desbalanceado) | Clasificación binaria | **F1 + ROC-AUC**, comparando LR balanceada / Decision Tree / Random Forest | Accuracy es engañosa en clases desbalanceadas — Random Forest con F1 en GridSearch fue la combinación más robusta |
+| Churn de clientes (bajas; ~85/15 desbalanceado) | Clasificación binaria | **F1 + ROC-AUC**, comparando LR balanceada / Decision Tree / Random Forest | Accuracy es engañosa en clases desbalanceadas — Random Forest con F1 en GridSearch fue la combinación más robusta |
 
 ---
 
 ## Comparativa de modelos de ensemble
 
-Practicados sobre datasets reales (cáncer de mama, diabetes Pima, demanda de bicicletas, MNIST): **Decision Tree** (importancias "puntiagudas", 1-2 features dominan) → **Bagging/Random Forest** (reparte importancia entre subconjuntos de datos/features, más estable) → **Gradient Boosting / XGBoost / LightGBM** (mejor rendimiento ajustando `learning_rate` × `max_depth` × `n_estimators`, a costa de más tiempo de entrenamiento).
+Un modelo *ensemble* combina muchos modelos simples para decidir en conjunto —como un jurado en vez de un solo juez—, lo que suele dar predicciones más estables y precisas. Practicados sobre datasets reales (cáncer de mama, diabetes Pima, demanda de bicicletas, MNIST): **Decision Tree** (un solo árbol de decisión; sus importancias son "puntiagudas", 1-2 variables dominan) → **Bagging/Random Forest** (muchos árboles sobre subconjuntos distintos de datos, más estable) → **Gradient Boosting / XGBoost / LightGBM** (árboles que aprenden de los errores del anterior; mejor rendimiento ajustando `learning_rate` × `max_depth` × `n_estimators`, a costa de más tiempo de entrenamiento).
 
 ---
 
 ## La "kata de ML" — cuando el dato correcto es no encontrar nada
 
-Práctica final sobre `cybersecurity_attacks.csv` (40.000 filas, 25 columnas, target `Action Taken`). Tras EDA, prueba de correlación categórica (Cramér's V) y modelado con Random Forest, la conclusión fue que **los datos son sintéticos y aleatorios: ningún modelo supera el ~33% en un problema de 3 clases**, sin importar el algoritmo o los hiperparámetros.
+Práctica final sobre `cybersecurity_attacks.csv` (40.000 filas, 25 columnas, target `Action Taken` con 3 clases: Allow / Block / Monitor). Tras el análisis exploratorio (**EDA**), una prueba de correlación categórica (Cramér's V) y modelado con Random Forest, la conclusión fue que **los datos son sintéticos y aleatorios: ningún modelo supera el ~33% en un problema de 3 clases**, sin importar el algoritmo o los hiperparámetros.
 
 > Este tipo de ejercicio se usa en procesos de selección para evaluar si el candidato entiende qué está pasando con los datos — en vez de forzar métricas artificialmente sobre un problema que no tiene solución. Una conclusión correcta y bien razonada vale más que una métrica alta sin comprensión.
 
