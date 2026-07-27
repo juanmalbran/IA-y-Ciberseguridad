@@ -58,6 +58,16 @@ Práctica final sobre `cybersecurity_attacks.csv` (40.000 filas, 25 columnas, ta
 
 ---
 
+## Código propio en este repositorio
+
+| Archivo | Qué hace |
+|---|---|
+| [`practica-final-ia-ciberataques.ipynb`](practica-final-ia-ciberataques.ipynb) | Mi **práctica final completa** (la "kata"): EDA, preprocesamiento, prueba de correlación categórica (Cramér's V) y comparación de Regresión Logística / Árbol de Decisión / Random Forest sobre `cybersecurity_attacks.csv`, con la conclusión razonada de que el dataset no tiene señal real que aprender (~0.33 de accuracy en 3 clases balanceadas = azar). GitHub renderiza el notebook con todos sus resultados y gráficos. |
+
+> El dataset `cybersecurity_attacks.csv` es el conjunto público *Cyber Security Attacks* (Kaggle); el notebook lo carga desde una carpeta `data/`.
+
+---
+
 ## Stack
 
 `Python` · `scikit-learn` · `XGBoost` · `LightGBM` · `ART (Adversarial Robustness Toolbox)` · `pandas` · `matplotlib / seaborn`
