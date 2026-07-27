@@ -2,91 +2,55 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Adversarial%20ML-BC8CFF?style=flat-square" />
-  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" />
-  <img src="https://img.shields.io/badge/XGBoost-006400?style=flat-square" />
-  <img src="https://img.shields.io/badge/ART%20(Adversarial%20Robustness%20Toolbox)-0B69A3?style=flat-square" />
+  <img src="https://img.shields.io/badge/OWASP%20LLM%20Top%2010-000000?style=flat-square&logo=owasp&logoColor=white" />
+  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
+  <img src="https://img.shields.io/badge/MITRE%20ATLAS-58A6FF?style=flat-square" />
 </p>
 
 ---
 
 ## Sobre este módulo
 
-Machine learning aplicado a ciberseguridad de punta a punta: detección de spam y churn, comparación de modelos de ensemble (Bagging, Random Forest, Gradient Boosting, XGBoost, LightGBM), y **ataque + defensa adversarial real** (FGSM) sobre un clasificador de phishing con ART. Incluye un ejercicio deliberadamente diseñado como trampa — un dataset de ataques cuyo valor está en darse cuenta de que **no tiene patrones reales que aprender**.
+La IA es a la vez **herramienta defensiva, superficie de ataque y arma ofensiva**. Este módulo cubre las tres caras: cómo la IA potencia la seguridad, cómo se ataca a los propios modelos, y los riesgos específicos de los LLM.
+
+**Temas cubiertos:** machine learning aplicado a detección · adversarial ML (evasión, envenenamiento, extracción de modelo) · seguridad de LLM (prompt injection, jailbreaking) · OWASP Top 10 para LLM · MITRE ATLAS · IA para red y blue team.
 
 ---
 
-## Ataque adversarial (FGSM) — ataque y defensa reales
+## Práctica final — ML aplicado + ataque adversarial
 
-Entrené un `RandomForestClassifier` para detectar phishing, lo envolví con **ART (Adversarial Robustness Toolbox)** y lo ataqué con **FGSM** (Fast Gradient Sign Method): una perturbación calculada en la dirección del gradiente de la pérdida, imperceptible para el ojo humano, que hizo caer la accuracy del modelo de forma significativa. Luego apliqué **adversarial training** (reentrenar incluyendo ejemplos adversariales) y la accuracy se recuperó.
+> 📄 **[Ver notebook completo](practica-final-ia-ciberataques.ipynb)** — EDA, preprocesamiento, comparación de modelos ensemble y un ataque adversarial FGSM, con resultados y conclusión. GitHub lo renderiza con todas las celdas y gráficos.
 
-```python
-rf.fit(X_train, y_train)                                  # accuracy original
-attack = FastGradientMethod(estimator=art_classifier, eps=0.1)
-X_adv = attack.generate(X_test)                            # accuracy cae bajo ataque
-trainer = AdversarialTrainer(art_classifier, attacks=attack).fit(X_train, y_train)
-                                                            # accuracy se recupera con defensa
-```
+Flujo completo de un problema de clasificación aplicado a ciberseguridad: análisis exploratorio, preprocesamiento y selección de variables (Cramér's V), entrenamiento y comparación de tres **modelos ensemble** (**Random Forest, XGBoost, LightGBM**) por F1 y ROC-AUC, y un ejercicio de **ataque/defensa adversarial (FGSM)** con la librería **ART** para mostrar cómo una perturbación mínima quiebra a un clasificador confiado.
+
+---
+
+## Concepto clave — Ataque adversarial (FGSM)
+
+Una perturbación imperceptible para el ojo humano, calculada en la dirección del gradiente de la pérdida, hace que un clasificador confiado falle por completo. Demuestra por qué un modelo con alta precisión no es necesariamente robusto.
 
 ![Ataque FGSM](fgsm-attack.png)
 
-**Lección:** un modelo con alta precisión no es necesariamente robusto — la superficie de ataque de un sistema de detección basado en ML incluye al propio modelo.
-
 ---
 
-## Detección de spam y churn (fundamentos + métricas)
+## Temas destacados
 
-Elegir bien la **métrica** es el corazón del problema: la *accuracy* (porcentaje de aciertos) engaña cuando una clase es mucho más frecuente que otra. Por eso se usan métricas que sí penalizan los errores importantes: el **F1-score** (equilibra no dejar pasar positivos ni marcar falsos positivos) y **ROC-AUC** (mide qué tan bien el modelo separa las dos clases).
-
-| Caso | Problema | Métrica elegida | Por qué |
-|---|---|---|---|
-| Spam en emails | Clasificación binaria | **F1-score** | Un falso negativo (spam no detectado) llega al usuario; accuracy sola engaña si hay desbalanceo |
-| Churn de clientes (bajas; ~85/15 desbalanceado) | Clasificación binaria | **F1 + ROC-AUC**, comparando LR balanceada / Decision Tree / Random Forest | Accuracy es engañosa en clases desbalanceadas — Random Forest con F1 en GridSearch fue la combinación más robusta |
-
----
-
-## Comparativa de modelos de ensemble
-
-Un modelo *ensemble* combina muchos modelos simples para decidir en conjunto —como un jurado en vez de un solo juez—, lo que suele dar predicciones más estables y precisas. Practicados sobre datasets reales (cáncer de mama, diabetes Pima, demanda de bicicletas, MNIST): **Decision Tree** (un solo árbol de decisión; sus importancias son "puntiagudas", 1-2 variables dominan) → **Bagging/Random Forest** (muchos árboles sobre subconjuntos distintos de datos, más estable) → **Gradient Boosting / XGBoost / LightGBM** (árboles que aprenden de los errores del anterior; mejor rendimiento ajustando `learning_rate` × `max_depth` × `n_estimators`, a costa de más tiempo de entrenamiento).
-
----
-
-## La "kata de ML" — cuando el dato correcto es no encontrar nada
-
-Práctica final sobre `cybersecurity_attacks.csv` (40.000 filas, 25 columnas, target `Action Taken` con 3 clases: Allow / Block / Monitor). Tras el análisis exploratorio (**EDA**), una prueba de correlación categórica (Cramér's V) y modelado con Random Forest, la conclusión fue que **los datos son sintéticos y aleatorios: ningún modelo supera el ~33% en un problema de 3 clases**, sin importar el algoritmo o los hiperparámetros.
-
-> Este tipo de ejercicio se usa en procesos de selección para evaluar si el candidato entiende qué está pasando con los datos — en vez de forzar métricas artificialmente sobre un problema que no tiene solución. Una conclusión correcta y bien razonada vale más que una métrica alta sin comprensión.
-
----
-
-## Código propio en este repositorio
-
-| Archivo | Qué hace |
-|---|---|
-| [`practica-final-ia-ciberataques.ipynb`](practica-final-ia-ciberataques.ipynb) | Mi **práctica final completa** (la "kata"): EDA, preprocesamiento, prueba de correlación categórica (Cramér's V) y comparación de Regresión Logística / Árbol de Decisión / Random Forest sobre `cybersecurity_attacks.csv`, con la conclusión razonada de que el dataset no tiene señal real que aprender (~0.33 de accuracy en 3 clases balanceadas = azar). GitHub renderiza el notebook con todos sus resultados y gráficos. |
-
-> El dataset `cybersecurity_attacks.csv` es el conjunto público *Cyber Security Attacks* (Kaggle); el notebook lo carga desde una carpeta `data/`.
+- **Adversarial ML** — evasión (FGSM, PGD), envenenamiento de datos de entrenamiento, robo de modelo por consultas.
+- **Seguridad de LLM** — prompt injection directa e indirecta, fuga de datos, el usuario como adversario no confiable.
+- **Marcos de referencia** — OWASP Top 10 para LLM (2025) y MITRE ATLAS para mapear amenazas a sistemas de IA.
+- **Doble uso** — la IA acelera tanto la detección de anomalías como la generación de phishing y malware.
 
 ---
 
 ## Stack
 
-`Python` · `scikit-learn` · `XGBoost` · `LightGBM` · `ART (Adversarial Robustness Toolbox)` · `pandas` · `matplotlib / seaborn`
+`Python` · `PyTorch` · `scikit-learn` · `XGBoost` · `LightGBM` · `ART (Adversarial Robustness Toolbox)` · `OWASP LLM Top 10` · `MITRE ATLAS`
 
 ---
 
-## Objetivos cumplidos
+## Módulo relacionado
 
-- [x] Clasificadores de spam y churn evaluados con la métrica correcta para cada desbalanceo
-- [x] Comparativa práctica de Decision Tree, Bagging, Random Forest, Gradient Boosting, XGBoost y LightGBM
-- [x] Ataque adversarial FGSM ejecutado y defendido con adversarial training (ART)
-- [x] Identificación correcta de un dataset sin señal real (kata de ML) en vez de forzar una métrica
-
----
-
-## Módulos relacionados
-
-- **[Análisis de Malware](https://github.com/juanmalbran/Analisis-de-Malware)** — ataques adversariales para evadir detectores de malware basados en ML.
-- **[Blue Team](https://github.com/juanmalbran/Blue-Team)** — el ML aplicado a detección de anomalías se integra en el pipeline del SOC.
+- **[Blue-Team](https://github.com/juanmalbran/Blue-Team)** — el ML aplicado a detección de anomalías se integra en el pipeline del SOC.
 
 ---
 
